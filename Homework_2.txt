@@ -1,0 +1,92 @@
+Sub homework_2()
+    Dim ticker As String
+    Dim volume As Integer
+    Dim column_titles3
+    Dim yearly_opening_value As Double
+    Dim yearly_closing_value As Double
+    Dim yearly_change As Double
+    Dim percentage_change As Double
+    column_titles3 = Array("Ticker", "Yearly Change", "Percent Change", "Total Stock Volume")
+    Dim row_in_table As Integer
+    
+    
+    '   Loop through each workbook
+    For Each ws In Worksheets
+    ' set start value of table at 2
+    row_in_table = 2
+    '   setting last row
+    last_row = ws.Cells(Rows.Count, 1).End(xlUp).Row
+    
+    ' set column titles on each worksheet
+    ws.Range("I1:L1").Value = column_titles3
+    ' set first opening value in worksheet
+    yearly_opening_value = ws.Range("C2").Value
+    
+    '   Loop through each worksheet
+        For i = 2 To last_row
+        
+            '   Distinguishing between each ticker
+            If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+                    
+            ticker = ws.Cells(i, 1).Value
+                    
+            volume_total = volume_total + ws.Cells(i, 7).Value
+            
+            yearly_closing_value = ws.Cells(i, 6).Value
+            
+            yearly_change = yearly_closing_value - yearly_opening_value
+            	' this is to avoid dividing by zero, which throws an error in the multi year but not the smaller data set
+                If yearly_opening_value = 0 Then
+                    percentage_change = 0
+                    
+                Else
+                
+                percentage_change = yearly_change / yearly_opening_value
+                
+                End If
+                    
+            '   Placing ticker in table under correct column
+            ws.Range("I" & row_in_table).Value = ticker
+            
+            '   Placing yearly change in table under correct column
+            ws.Range("J" & row_in_table).Value = yearly_change
+            
+            '   Placing percentage in table under correct column
+            ws.Range("K" & row_in_table).Value = percentage_change
+            ws.Range("K" & row_in_table).NumberFormat = "0.00%"
+
+                    
+            '   Placing volume in table under correct column
+            ws.Range("L" & row_in_table).Value = volume_total
+                                    
+            '   New ticker, new row
+            row_in_table = row_in_table + 1
+                    
+                    
+            '   reset values to zero and to first value in cell respectively
+            volume_total = 0
+            yearly_opening_value = ws.Cells(i + 1, 3)
+            
+            Else
+            
+            volume_total = volume_total + ws.Cells(i, 7).Value
+            
+            End If
+            
+            Next i
+        
+	' all values below end of table will be colored otherwise
+        lastrow_row_in_table = ws.Cells(Rows.Count, 9).End(xlUp).Row
+        
+        For i = 2 To lastrow_row_in_table
+            If ws.Cells(i, 10).Value < 0 Then
+            
+                ws.Cells(i, 10).Interior.ColorIndex = 3
+                
+            Else
+                ws.Cells(i, 10).Interior.ColorIndex = 4
+        End If
+        Next i
+    Next ws
+            
+End Sub
